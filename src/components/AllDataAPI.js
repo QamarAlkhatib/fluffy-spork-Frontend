@@ -3,6 +3,7 @@ import { withAuth0 } from '@auth0/auth0-react';
 import axios from 'axios'
 import CardsData from './CardsData.js'
 import 'bootstrap/dist/css/bootstrap.min.css';
+import MyFavorites from './MyFavorites.js';
 
 class AllDataAPI extends Component {
     constructor(props) {
@@ -10,14 +11,14 @@ class AllDataAPI extends Component {
         this.state = {
             ApiData: [],
             AddToFav: [],
-            email:this.props.auth0.user.email
+            email: this.props.auth0.user.email
 
         }
     }
 
     async componentDidMount() {
         console.log('component')
-        let DataURL = `https://fluffy-spork-backend.herokuapp.com/AllData`
+        let DataURL = `${process.env.HEROKU}/AllData`
 
         let newArray = await axios.get(DataURL)
 
@@ -35,13 +36,15 @@ class AllDataAPI extends Component {
             email: this.state.email
         }
 
-        let newData = await axios.post(`https://fluffy-spork-backend.herokuapp.com/addToFav`, addedData);
+        let newData = await axios.post(`${process.env.HEROKU}/addToFav`, addedData);
 
         this.setState({
             AddToFav: newData.data
         });
         console.log('wasAdded', this.state.AddToFav)
     }
+
+  
 
     render() {
         return (
@@ -55,9 +58,13 @@ class AllDataAPI extends Component {
                 <div >
                     {this.state.ApiData.map((val, indx) => {
                         return (
-                            <CardsData indx={indx} val={val} addToFav={this.addToFav} email={this.state.email}/>
+                            <CardsData indx={indx} val={val} addToFav={this.addToFav} email={this.state.email} />
                         )
                     })}
+                </div>
+
+                <div>
+                    <MyFavorites email={this.state.email}/>
                 </div>
             </>
         )

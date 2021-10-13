@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
-import { Modal, Button, Form } from 'react-bootstrap/'
+import { Modal, Button, Form, Col } from 'react-bootstrap/'
 class UpdateForm extends Component {
+
     render() {
         return (
             <div>
@@ -10,18 +11,21 @@ class UpdateForm extends Component {
                             <Modal.Title>Update Data Modal</Modal.Title>
                         </Modal.Header>
                         <Modal.Body>
-                            <Form onSubmit={() => { this.props.updateFun(this.props.val) }}>
-                                < Form.Group className="mb-3" >
-                                    <Form.Control type="text" name='title' defaultValue={this.props.Data.title} />
-                                </Form.Group>
-                                <Form.Group className="mb-3" >
-                                    <Form.Control type="text" name='imageUrl' defaultValue={this.props.Data.imageUrl} />
-                                </Form.Group>
-                                {/* onClick={() => { this.props.updateFun(this.props.val) }}  */}
-                                <Button variant="warning" type="submit" value="Update">
+                            <Form onSubmit={this.props.updateFun} >
+                                <Col sm="10" className="mb-3" >
+                                    <Form.Control type="text" name='title' defaultValue={this.props.updateData.title} />
+                                </Col>
+
+                                <Col sm="10" className="mb-3" >
+                                    <Form.Control type="text" name='imageUrl' defaultValue={this.props.updateData.imageUrl} />
+                                </Col>
+
+                                <Button type="submit" variant="warning" value="Update">
                                     Update
                                 </Button>
+
                             </Form>
+
                         </Modal.Body>
                     </Modal >
                 </div >
