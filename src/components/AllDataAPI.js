@@ -3,43 +3,44 @@ import { withAuth0 } from '@auth0/auth0-react';
 import axios from 'axios'
 import CardsData from './CardsData.js'
 import 'bootstrap/dist/css/bootstrap.min.css';
+
 class AllDataAPI extends Component {
     constructor(props) {
         super(props)
         this.state = {
             ApiData: [],
-            AddToFav:[],
-            // email:this.props.auth0.user.email
+            AddToFav: [],
+            email:this.props.auth0.user.email
 
         }
     }
 
     async componentDidMount() {
-
-        let DataURL = `http://localhost:3002/AllData`
+        console.log('component')
+        let DataURL = `https://fluffy-spork-backend.herokuapp.com/AllData`
 
         let newArray = await axios.get(DataURL)
 
-        this.setState({
+        await this.setState({
             ApiData: newArray.data,
         })
     }
 
-    addToFav =async()=>{
+    addToFav = async (id) => {
 
-        const addedData ={
-            title:this.state.ApiData.title,
-            imageUrl:this.state.ApiData.imageUrl,
-            id:this.state.ApiData.id,
-            email:this.props.auth0.user.email
+        const addedData = {
+            title: this.state.ApiData[id].title,
+            imageUrl: this.state.ApiData[id].imageUrl,
+            id: this.state.ApiData[id].id,
+            email: this.state.email
         }
 
-        let newData = await axios.post(`http://localhost:3002/addToFav`,addedData);
+        let newData = await axios.post(`https://fluffy-spork-backend.herokuapp.com/addToFav`, addedData);
 
         this.setState({
-            AddToFav:newData.data
+            AddToFav: newData.data
         });
-        // console.log('wasAdded',this.state.ApiData)
+        console.log('wasAdded', this.state.AddToFav)
     }
 
     render() {
@@ -48,14 +49,16 @@ class AllDataAPI extends Component {
                 <div>
                     <h1>All Data from the API</h1>
                     <h3>Select your favorites :)</h3>
+
                 </div>
-              
-                    {this.state.ApiData.map((val,indx) => {
+
+                <div >
+                    {this.state.ApiData.map((val, indx) => {
                         return (
-                            <CardsData indx={indx} val={val} addToFav={this.addToFav}/>
+                            <CardsData indx={indx} val={val} addToFav={this.addToFav} email={this.state.email}/>
                         )
                     })}
-               
+                </div>
             </>
         )
     }

@@ -4,53 +4,69 @@ import '././MyFavorites.js';
 import { withAuth0 } from '@auth0/auth0-react';
 import axios from 'axios'
 import { Card, Button } from 'react-bootstrap/'
+import UpdateForm from './UpdateForm'
+import FavCards from './FavCards'
 
 
 class MyFavorites extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      AddedData: [],
-      DeleteDataArr: [],
-      updatedData:[]
+      Data: [],
+      showModel: false,
+      updatedData: []
     }
+  }
+
+  handelShow = (DataInfo) => {
+    console.log('Data', DataInfo)
+    this.setState({
+      updatedData: DataInfo,
+      showModel: true,
+    })
+  }
+  handelClose = () => {
+    this.setState({
+      showModel: false,
+    })
   }
 
   async componentDidMount() {
 
-    let DataURL = `http://localhost:3002/getFav`
+    let DataURL = `https://fluffy-spork-backend.herokuapp.com/getFav`
 
     let newArray = await axios.get(DataURL)
 
     this.setState({
-      AddedData: newArray.data,
+      Data: newArray.data,
     })
   }
 
   DeleteFun = async (id) => {
 
-    const DeleteData = {
-      title: this.state.AddedData.title,
-      imageUrl: this.state.AddedData.imageUrl,
-      id: this.state.AddedData.id,
-      email: this.props.auth0.user.email
-    }
-    let Deleted = await axios.delete(`http://localhost:3002/FavDelete?${id}`, DeleteData)
-
+    let Deleted = await axios.delete(`https://fluffy-spork-backend.herokuapp.com/FavDelete?email=${this.props.email}&id=${id}`)
     this.setState({
-      DeleteDataArr: Deleted.data
+      Data: Deleted.data
     });
-    console.log('delete', this.state.DeleteDataArr)
+
   }
 
-  updateFun = async(id)=>{
+  updateFun = async (e) => {
+    e.preventDefault();
+    console.log('ID', this.state.updatedData._id);
 
-    let updated = await axios.put(`http://localhost:3002/updateData?${id}`);
+    let UpdateDataForm = {
+      email: this.props.email,
+      title: e.target.title,
+      imageUrl: e.target.imageUrl,
+      id: this.state.updatedData._id
+
+    }
+    let updated = await axios.put(`https://fluffy-spork-backend.herokuapp.com/updateData`, UpdateDataForm);
 
     this.setState({
-      updatedData: updated.data
+      Data: updated.data
     });
-    console.log('update', this.state.updatedData)
 
   }
 
@@ -63,23 +79,18 @@ class MyFavorites extends React.Component {
         </p>
 
         <div>
-          {this.state.AddedData.map((val) => {
+          {this.state.Data.map((val, key) => {
             return (
-
-              <Card style={{ width: '18rem' }}>
-                <Card.Img variant="top" src={val.imageUrl} />
-                <Card.Body>
-                  <Card.Title>{val.title}</Card.Title>
-                  <Button onClick={this.DeleteFun} variant="primary">Delete</Button>
-                  <Button onClick={this.updateFun} variant="primary">Update</Button>
-                
-                </Card.Body>
-              </Card>
-
+              <FavCards val={val} key={key} DeleteFun={this.DeleteFun} handelShow={this.handelShow} />
             )
 
           })}
         </div>
+
+        {this.state.showModel &&
+
+          <UpdateForm updateFun={this.updateFun} Data={this.state.updatedData} handelClose={this.handelClose} show={this.state.showModel} />
+        }
       </>
     )
   }
